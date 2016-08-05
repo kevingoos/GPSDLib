@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("TestNmeaParser")]
+[assembly: AssemblyTitle("GPSD.TestConsole")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Infrabel")]
-[assembly: AssemblyProduct("TestNmeaParser")]
+[assembly: AssemblyProduct("GPSD.TestConsole")]
 [assembly: AssemblyCopyright("Copyright © Infrabel 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("7ba8591b-d483-4c2f-ba4c-ff4b56373894")]
+[assembly: Guid("a5abdccf-eca9-4c69-9b89-63c4432d9e07")]
 
 // Version information for an assembly consists of the following four values:
 //

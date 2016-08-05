@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using NmeaParser;
 
-namespace TestNmeaParser
+namespace GPSD.Library
 {
     // State object for receiving data from remote device.
     public class StateObject
@@ -23,42 +23,46 @@ namespace TestNmeaParser
         public StringBuilder sb = new StringBuilder();
     }
 
-    public class GpsService
+    public class GpsdService
     {
         private const string ProxyAddress = "proxy";
         private const string ServerAddress = "178.50.179.166";
         private const int Port = 80;
 
         // ManualResetEvent instances signal completion.
-        private static readonly ManualResetEvent ReceiveDone =
+        private static ManualResetEvent ReceiveDone =
             new ManualResetEvent(false);
 
         // The response from the remote device.
         private static string _response = string.Empty;
 
 
-        
+
 
         public void StartService()
         {
             using (var client = ConnectViaHttpProxy(ServerAddress, Port, ProxyAddress, Port))
             {
-                if (client.Connected)
-                {
-                    var device = new StreamDevice(client.GetStream());
-                    device.MessageReceived += device_NmeaMessageReceived;
-                    device.OpenAsync();
-                }
+                //if (client.Connected)
+                //{
+                //    var device = new StreamDevice(client.GetStream());
+                //    device.MessageReceived += device_NmeaMessageReceived;
+                //    device.OpenAsync();
+                //}
 
 
-                //Receive(client.Client);
-                //ReceiveDone.WaitOne();
+                Receive(client.Client);
+                ReceiveDone.WaitOne();
+
+                ReceiveDone = new ManualResetEvent(false);
+                Receive(client.Client);
+                ReceiveDone.WaitOne();
             }
         }
 
         private void device_NmeaMessageReceived(object sender, NmeaMessageReceivedEventArgs e)
         {
-            
+
         }
 
         static TcpClient ConnectViaHttpProxy(string targetHost, int targetPort, string httpProxyHost, int httpProxyPort)
@@ -127,7 +131,7 @@ namespace TestNmeaParser
             {
                 StateObject state = (StateObject)ar.AsyncState;
                 var client = state.workSocket;
-                
+
                 var bytesRead = client.EndReceive(ar);
                 _response = Encoding.UTF8.GetString(state.buffer, 0, state.buffer.Length);
                 ReceiveDone.Set();
@@ -142,6 +146,4 @@ namespace TestNmeaParser
 
 
     }
-
-
 }
