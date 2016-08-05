@@ -80,7 +80,7 @@ namespace TestNmeaParser
             request.Proxy = webProxy;
             request.Method = "CONNECT";
 
-            webProxy.Credentials = new NetworkCredential("EXJ508", "Xlssx532");
+            webProxy.Credentials = new NetworkCredential("EXJ508", "*****");
             //webProxy.UseDefaultCredentials = true;
 
             var response = request.GetResponse();
