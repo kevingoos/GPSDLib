@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
+using System.Net.Http;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
@@ -16,15 +17,15 @@ namespace GPSD.Library
         // Client socket.
         public Socket workSocket = null;
         // Size of receive buffer.
-        public const int BufferSize = 256;
+        public const int BufferSize = 4096;
         // Receive buffer.
         public byte[] buffer = new byte[BufferSize];
         // Received data string.
         public StringBuilder sb = new StringBuilder();
     }
-
+     
     public class GpsdService
-    {
+    { 
         private const string ProxyAddress = "proxy";
         private const string ServerAddress = "178.50.179.166";
         private const int Port = 80;
@@ -50,13 +51,16 @@ namespace GPSD.Library
                 //    device.OpenAsync();
                 //}
 
+                while (client.Connected)
+                {
+                    var result = new byte[256];
+                    client.Client.Receive(result);
 
-                Receive(client.Client);
-                ReceiveDone.WaitOne();
-
-                ReceiveDone = new ManualResetEvent(false);
-                Receive(client.Client);
-                ReceiveDone.WaitOne();
+                    _response = Encoding.UTF8.GetString(result, 0, result.Length);
+                    Console.WriteLine(_response);
+                }
+                
+                client.Close();
             }
         }
 
@@ -84,7 +88,7 @@ namespace GPSD.Library
             request.Proxy = webProxy;
             request.Method = "CONNECT";
 
-            webProxy.Credentials = new NetworkCredential("EXJ508", "*****");
+            webProxy.Credentials = new NetworkCredential("EXJ508", "Xlssx532");
             //webProxy.UseDefaultCredentials = true;
 
             var response = request.GetResponse();
