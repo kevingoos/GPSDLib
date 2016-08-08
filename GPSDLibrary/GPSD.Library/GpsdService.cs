@@ -8,34 +8,19 @@ using System.Threading;
 using Newtonsoft.Json;
 
 namespace GPSD.Library
-{
-    // State object for receiving data from remote device.
-    public class StateObject
-    {
-        // Client socket.
-        public Socket workSocket = null;
-        // Size of receive buffer.
-        public const int BufferSize = 4096;
-        // Receive buffer.
-        public byte[] buffer = new byte[BufferSize];
-        // Received data string.
-        public StringBuilder sb = new StringBuilder();
-    }
-     
+{     
     public class GpsdService
     {
         private readonly string _serverAddress;
         private readonly int _serverPort;
 
-        private bool proxyEnabled = false;
+        private bool _proxyEnabled;
         private string _proxyAddress;
         private int _proxyPort;
 
-        private bool proxyAuthenticationEnabled = false;
+        private bool _proxyAuthenticationEnabled;
         private string _proxyUsername;
         private string _proxyPassword;
-
-
 
         public GpsdService(string serverAddress, int serverPort)
         {
@@ -43,18 +28,6 @@ namespace GPSD.Library
             _serverPort = serverPort;
         }
 
-        public void SetProxy(string proxyAddress, int proxyPort)
-        {
-            _proxyAddress = proxyAddress;
-            _proxyPort = proxyPort;
-        }
-
-        public void SetProxyAuthentication(string username, string password)
-        {
-            _proxyUsername = username;
-            _proxyPassword = password;
-        }
-        
         public void StartService()
         {
             using (var client = GetTcpClient())
@@ -80,7 +53,28 @@ namespace GPSD.Library
 
         private TcpClient GetTcpClient()
         {
-            return proxyEnabled ? ConnectViaHttpProxy() : new TcpClient(_serverAddress, _serverPort);
+            return _proxyEnabled ? ConnectViaHttpProxy() : new TcpClient(_serverAddress, _serverPort);
+        }
+
+        #region Proxies
+
+        public void SetProxy(string proxyAddress, int proxyPort)
+        {
+            _proxyEnabled = true;
+            _proxyAddress = proxyAddress;
+            _proxyPort = proxyPort;
+        }
+
+        public void SetProxyAuthentication(string username, string password)
+        {
+            _proxyAuthenticationEnabled = true;
+            _proxyUsername = username;
+            _proxyPassword = password;
+        }
+
+        public void DisableProxy()
+        {
+            _proxyEnabled = false;
         }
 
         private TcpClient ConnectViaHttpProxy()
@@ -99,7 +93,7 @@ namespace GPSD.Library
             request.Proxy = webProxy;
             request.Method = "CONNECT";
 
-            if (proxyAuthenticationEnabled)
+            if (_proxyAuthenticationEnabled)
             {
                 webProxy.Credentials = new NetworkCredential(_proxyUsername, _proxyPassword);
             }
@@ -128,5 +122,7 @@ namespace GPSD.Library
 
             return new TcpClient { Client = socket };
         }
+
+        #endregion
     }
 }
