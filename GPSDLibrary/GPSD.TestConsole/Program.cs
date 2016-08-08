@@ -10,9 +10,6 @@ namespace GPSD.TestConsole
             //gpsdService.SetProxy("proxy", 80);
             //gpsdService.SetProxyAuthentication("EXJ508", "*****");
             gpsdService.StartService();
-
-            //ListernerTest test = new ListernerTest();
-            //test.createListener();
         }
     }
 }

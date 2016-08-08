@@ -23,6 +23,7 @@ namespace GPSD.Library
         private string _proxyPassword;
 
         public bool IsRunning { get; set; }
+        private TcpClient _client;
 
         public GpsdService(string serverAddress, int serverPort)
         {
@@ -33,11 +34,11 @@ namespace GPSD.Library
 
         public void StartService()
         {
-            using (var client = GetTcpClient())
+            using (_client = GetTcpClient())
             {
-                if (!client.Connected) return;
+                if (!_client.Connected) return;
                 
-                var networkStream = client.GetStream();
+                var networkStream = _client.GetStream();
                 var result = new byte[256];
                 networkStream.Read(result, 0, result.Length);
 
@@ -48,24 +49,29 @@ namespace GPSD.Library
                 var byteData = Encoding.ASCII.GetBytes("?WATCH={\"enable\":true,\"json\":true}");
                 networkStream.Write(byteData, 0, byteData.Length);
                 
-                while (IsRunning && client.Connected)
+                while (IsRunning && _client.Connected)
                 {
                     networkStream.Read(result, 0, result.Length);
                     var response = Encoding.ASCII.GetString(result, 0, result.Length);
                     Console.WriteLine(response);
                     Thread.Sleep(10);
                 }
-                client.Close();
             }
         }
 
-        private TcpClient GetTcpClient()
+        public void StopService()
         {
-            return _proxyEnabled ? ConnectViaHttpProxy() : new TcpClient(_serverAddress, _serverPort);
+            IsRunning = false;
+
+            var networkStream = _client.GetStream();
+            var byteData = Encoding.ASCII.GetBytes("?WATCH={\"enable\":false}");
+            networkStream.Write(byteData, 0, byteData.Length);
+
+            _client.Close();
         }
-
+        
         #region Proxies
-
+        
         public void SetProxy(string proxyAddress, int proxyPort)
         {
             _proxyEnabled = true;
@@ -83,6 +89,11 @@ namespace GPSD.Library
         public void DisableProxy()
         {
             _proxyEnabled = false;
+        }
+
+        private TcpClient GetTcpClient()
+        {
+            return _proxyEnabled ? ConnectViaHttpProxy() : new TcpClient(_serverAddress, _serverPort);
         }
 
         private TcpClient ConnectViaHttpProxy()
