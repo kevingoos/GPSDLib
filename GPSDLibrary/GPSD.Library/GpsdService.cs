@@ -22,31 +22,39 @@ namespace GPSD.Library
         private string _proxyUsername;
         private string _proxyPassword;
 
+        public bool IsRunning { get; set; }
+
         public GpsdService(string serverAddress, int serverPort)
         {
             _serverAddress = serverAddress;
             _serverPort = serverPort;
+            IsRunning = true;
         }
 
         public void StartService()
         {
             using (var client = GetTcpClient())
             {
-                while (client.Connected)
-                {
-                    var result = new byte[256];
-                    client.Client.Receive(result);
-                    
-                    var response = Encoding.ASCII.GetString(result, 0, result.Length);
-                    var resultClass = JsonConvert.DeserializeObject<GpsdData>(response);
-                    Console.WriteLine(resultClass.ToString());
-                    
-                    var byteData = Encoding.ASCII.GetBytes("?WATCH={\"enable\":true,\"json\":true}");
-                    client.Client.Send(byteData);
+                if (!client.Connected) return;
+                
+                var networkStream = client.GetStream();
+                var result = new byte[256];
+                networkStream.Read(result, 0, result.Length);
 
+                var responseData = Encoding.ASCII.GetString(result, 0, result.Length);
+                var gpsData = JsonConvert.DeserializeObject<GpsdData>(responseData);
+                Console.WriteLine(gpsData.ToString());
+
+                var byteData = Encoding.ASCII.GetBytes("?WATCH={\"enable\":true,\"json\":true}");
+                networkStream.Write(byteData, 0, byteData.Length);
+                
+                while (IsRunning && client.Connected)
+                {
+                    networkStream.Read(result, 0, result.Length);
+                    var response = Encoding.ASCII.GetString(result, 0, result.Length);
+                    Console.WriteLine(response);
                     Thread.Sleep(10);
                 }
-                
                 client.Close();
             }
         }
