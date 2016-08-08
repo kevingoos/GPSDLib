@@ -8,6 +8,9 @@ namespace GPSD.TestConsole
         {
             var gpsdService = new GpsdService();
             gpsdService.StartService();
+
+            //ListernerTest test = new ListernerTest();
+            //test.createListener();
         }
     }
 }

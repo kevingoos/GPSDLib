@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
@@ -8,6 +9,7 @@ using System.Reflection;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 using Newtonsoft.Json;
 using NmeaParser;
 
@@ -38,10 +40,7 @@ namespace GPSD.Library
 
         // The response from the remote device.
         private static string _response = string.Empty;
-
-
-
-
+        
         public void StartService()
         {
             using (var client = ConnectViaHttpProxy(ServerAddress, Port, ProxyAddress, Port))
@@ -58,18 +57,17 @@ namespace GPSD.Library
                     var result = new byte[256];
                     client.Client.Receive(result);
 
-                    _response = Encoding.UTF8.GetString(result, 0, result.Length);
+                    
+                    //_response = Encoding.UTF8.GetString(result, 0, result.Length);
+                    _response = Encoding.ASCII.GetString(result, 0, result.Length);
                     var resultClass = JsonConvert.DeserializeObject<GpsdData>(_response);
                     Console.WriteLine(resultClass.ToString());
+
+                    Thread.Sleep(10);
                 }
                 
                 client.Close();
             }
-        }
-
-        private void device_NmeaMessageReceived(object sender, NmeaMessageReceivedEventArgs e)
-        {
-
         }
 
         static TcpClient ConnectViaHttpProxy(string targetHost, int targetPort, string httpProxyHost, int httpProxyPort)
