@@ -63,6 +63,11 @@ namespace GPSD.Library
                     var resultClass = JsonConvert.DeserializeObject<GpsdData>(_response);
                     Console.WriteLine(resultClass.ToString());
 
+
+
+                    var byteData = Encoding.ASCII.GetBytes("?WATCH={\"enable\":true,\"json\":true}");
+                    client.Client.Send(byteData);
+
                     Thread.Sleep(10);
                 }
                 
@@ -89,7 +94,7 @@ namespace GPSD.Library
             request.Proxy = webProxy;
             request.Method = "CONNECT";
 
-            webProxy.Credentials = new NetworkCredential("EXJ508", "Xlssx532");
+            webProxy.Credentials = new NetworkCredential("EXJ508", "*****");
             //webProxy.UseDefaultCredentials = true;
 
             var response = request.GetResponse();
