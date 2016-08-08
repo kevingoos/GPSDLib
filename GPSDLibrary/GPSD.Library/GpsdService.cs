@@ -5,8 +5,10 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading;
+using Newtonsoft.Json;
 using NmeaParser;
 
 namespace GPSD.Library
@@ -27,7 +29,7 @@ namespace GPSD.Library
     public class GpsdService
     { 
         private const string ProxyAddress = "proxy";
-        private const string ServerAddress = "178.50.179.166";
+        private const string ServerAddress = "178.50.42.172";
         private const int Port = 80;
 
         // ManualResetEvent instances signal completion.
@@ -57,7 +59,8 @@ namespace GPSD.Library
                     client.Client.Receive(result);
 
                     _response = Encoding.UTF8.GetString(result, 0, result.Length);
-                    Console.WriteLine(_response);
+                    var resultClass = JsonConvert.DeserializeObject<GpsdData>(_response);
+                    Console.WriteLine(resultClass.ToString());
                 }
                 
                 client.Close();
