@@ -13,7 +13,7 @@ namespace GPSD.Library.Models
             {"VERSION", typeof(GpsdVersion)},
             {"DEVICES", typeof(GpsDevice)},
             {"WATCH", typeof(GpsdOptions)},
-            {"TVP", typeof(GpsLocation)}
+            {"TPV", typeof(GpsLocation)}
         };
 
         [DataMember(Name = "class")]

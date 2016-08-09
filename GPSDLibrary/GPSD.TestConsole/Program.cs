@@ -11,21 +11,22 @@ namespace GPSD.TestConsole
         private delegate bool EventHandler();
         static EventHandler _handler;
 
-        private static GpsdService gpsdService;
+        private static GpsdService _gpsdService;
 
         static void Main(string[] args)
         {
             _handler += Handler;
             SetConsoleCtrlHandler(_handler, true);
 
-            gpsdService = new GpsdService("178.50.89.134", 80);
-            gpsdService.SetProxy("proxy", 80);
-            gpsdService.StartService();
+            _gpsdService = new GpsdService("178.50.89.134", 80);
+            _gpsdService.SetProxy("proxy", 80);
+            _gpsdService.SetProxyAuthentication("*****", "*****");
+            _gpsdService.StartService();
         }
 
         private static bool Handler()
         {
-            gpsdService?.StopService();
+            _gpsdService?.StopService();
             return true;
         }
     }

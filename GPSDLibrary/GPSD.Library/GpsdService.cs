@@ -64,6 +64,8 @@ namespace GPSD.Library
             {
                 if (!_client.Connected) return;
                 
+                var gpsdDataParser = new GpsdDataParser();
+
                 var networkStream = _client.GetStream();
                 var streamReader = new StreamReader(networkStream);
 
@@ -76,7 +78,7 @@ namespace GPSD.Library
                 while (IsRunning && _client.Connected)
                 {
                     line = streamReader.ReadLine();
-                    var classType = JsonConvert.DeserializeObject<DataClassType>(line);
+                    var value = gpsdDataParser.GetGpsData(line);
                     Console.WriteLine(line);
                     Thread.Sleep(ReadFrequenty);
                 }
