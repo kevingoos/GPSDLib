@@ -25,6 +25,8 @@ namespace GPSD.Library
         private bool _proxyAuthenticationEnabled;
         private string _proxyUsername;
         private string _proxyPassword;
+
+        private GpsLocation _previousGpsLocation;
         
         #endregion
 
@@ -64,23 +66,33 @@ namespace GPSD.Library
             {
                 if (!_client.Connected) return;
                 
-                var gpsdDataParser = new GpsdDataParser();
-
                 var networkStream = _client.GetStream();
                 var streamReader = new StreamReader(networkStream);
 
-                var line = streamReader.ReadLine();
-                GpsdVersion = JsonConvert.DeserializeObject<GpsdVersion>(line);
-                Console.WriteLine(GpsdVersion.ToString());
-
-                ExecuteCommand(networkStream, GpsOptions.GetCommand());
+                var gpsdDataParser = new GpsdDataParser();
 
                 while (IsRunning && _client.Connected)
                 {
-                    line = streamReader.ReadLine();
-                    var value = gpsdDataParser.GetGpsData(line);
-                    Console.WriteLine(line);
-                    Thread.Sleep(ReadFrequenty);
+                    var gpsData = streamReader.ReadLine();
+                    var message = gpsdDataParser.GetGpsData(gpsData);
+
+                    var version = message as GpsdVersion;
+                    if (version != null)
+                    {
+                        GpsdVersion = version;
+                        Console.WriteLine(GpsdVersion.ToString());
+
+                        ExecuteCommand(networkStream, GpsOptions.GetCommand());
+                    }
+
+                    var gpsLocation = message as GpsLocation;
+                    if (gpsLocation != null &&
+                        (_previousGpsLocation == null ||
+                         gpsLocation.Time.Subtract(new TimeSpan(0, 0, 0, 0, ReadFrequenty)) > _previousGpsLocation.Time))
+                    {
+                        _previousGpsLocation = gpsLocation;
+                        Thread.Sleep(ReadFrequenty);
+                    }
                 }
             }
         }
