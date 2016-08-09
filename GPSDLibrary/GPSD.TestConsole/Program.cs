@@ -6,7 +6,7 @@ namespace GPSD.TestConsole
     {
         static void Main(string[] args)
         {
-            var gpsdService = new GpsdService("178.50.42.172", 80);
+            var gpsdService = new GpsdService("178.50.89.134", 80);
             gpsdService.SetProxy("proxy", 80);
             gpsdService.SetProxyAuthentication("*****", "*****");
             gpsdService.StartService();

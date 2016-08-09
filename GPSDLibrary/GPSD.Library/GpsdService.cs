@@ -28,6 +28,8 @@ namespace GPSD.Library
 
         public GpsdVersion GpsdVersion { get; set; }
 
+        public int ReadFrequenty = 10;
+
         public GpsdService(string serverAddress, int serverPort)
         {
             _serverAddress = serverAddress;
@@ -49,7 +51,7 @@ namespace GPSD.Library
                 GpsdVersion = JsonConvert.DeserializeObject<GpsdVersion>(responseData);
                 Console.WriteLine(GpsdVersion.ToString());
 
-                var byteData = Encoding.ASCII.GetBytes("?WATCH={\"enable\":true,\"json\":true}");
+                var byteData = Encoding.ASCII.GetBytes(GpsCommands.EnableCommand);
                 networkStream.Write(byteData, 0, byteData.Length);
 
                 result = new byte[512];
@@ -58,7 +60,7 @@ namespace GPSD.Library
                     networkStream.Read(result, 0, result.Length);
                     var response = Encoding.ASCII.GetString(result, 0, result.Length);
                     Console.WriteLine(response);
-                    Thread.Sleep(10);
+                    Thread.Sleep(ReadFrequenty);
                 }
             }
         }
@@ -68,7 +70,7 @@ namespace GPSD.Library
             IsRunning = false;
 
             var networkStream = _client.GetStream();
-            var byteData = Encoding.ASCII.GetBytes("?WATCH={\"enable\":false}");
+            var byteData = Encoding.ASCII.GetBytes(GpsCommands.DisableCommand);
             networkStream.Write(byteData, 0, byteData.Length);
 
             _client.Close();
