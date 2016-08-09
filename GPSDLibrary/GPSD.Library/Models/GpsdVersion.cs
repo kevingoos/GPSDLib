@@ -1,13 +1,10 @@
 ﻿using System.Runtime.Serialization;
 
-namespace GPSD.Library
+namespace GPSD.Library.Models
 {
     [DataContract]
-    public class GpsdData
+    public class GpsdVersion
     {
-        [DataMember(Name = "class")]
-        public string Class { get; set; }
-
         [DataMember(Name = "release")]
         public string Release { get; set; }
 
@@ -22,7 +19,7 @@ namespace GPSD.Library
 
         public override string ToString()
         {
-            return $"{Class} - Release: {Release} - Revision: {Rev} - ProtoMajor: {ProtoMajor} - ProtoMinor: {ProtoMinor}";
+            return $"Release: {Release} - Revision: {Rev} - ProtoMajor: {ProtoMajor} - ProtoMinor: {ProtoMinor}";
         }
     }
 }

@@ -46,8 +46,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GpsdData.cs" />
+    <Compile Include="Models\GpsdVersion.cs" />
     <Compile Include="GpsdService.cs" />
+    <Compile Include="Models\GpsLocation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using GPSD.Library.Models;
 using Newtonsoft.Json;
 
 namespace GPSD.Library
@@ -25,6 +26,8 @@ namespace GPSD.Library
         public bool IsRunning { get; set; }
         private TcpClient _client;
 
+        public GpsdVersion GpsdVersion { get; set; }
+
         public GpsdService(string serverAddress, int serverPort)
         {
             _serverAddress = serverAddress;
@@ -39,16 +42,17 @@ namespace GPSD.Library
                 if (!_client.Connected) return;
                 
                 var networkStream = _client.GetStream();
-                var result = new byte[256];
+                var result = new byte[128];
                 networkStream.Read(result, 0, result.Length);
 
                 var responseData = Encoding.ASCII.GetString(result, 0, result.Length);
-                var gpsData = JsonConvert.DeserializeObject<GpsdData>(responseData);
-                Console.WriteLine(gpsData.ToString());
+                GpsdVersion = JsonConvert.DeserializeObject<GpsdVersion>(responseData);
+                Console.WriteLine(GpsdVersion.ToString());
 
                 var byteData = Encoding.ASCII.GetBytes("?WATCH={\"enable\":true,\"json\":true}");
                 networkStream.Write(byteData, 0, byteData.Length);
-                
+
+                result = new byte[512];
                 while (IsRunning && _client.Connected)
                 {
                     networkStream.Read(result, 0, result.Length);
