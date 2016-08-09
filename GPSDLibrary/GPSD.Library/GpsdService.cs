@@ -35,7 +35,7 @@ namespace GPSD.Library
         public bool IsRunning { get; set; }
         
         public GpsdVersion GpsdVersion { get; set; }
-        public int ReadFrequenty = 10;
+        public int ReadFrequenty { get; set; } = 1000;
 
         public GpsdOptions GpsOptions { get; set; }
         
@@ -90,6 +90,7 @@ namespace GPSD.Library
                         (_previousGpsLocation == null ||
                          gpsLocation.Time.Subtract(new TimeSpan(0, 0, 0, 0, ReadFrequenty)) > _previousGpsLocation.Time))
                     {
+                        Console.WriteLine(gpsLocation.ToString());
                         _previousGpsLocation = gpsLocation;
                         Thread.Sleep(ReadFrequenty);
                     }
