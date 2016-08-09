@@ -9,7 +9,7 @@ using GPSD.Library.Models;
 using Newtonsoft.Json;
 
 namespace GPSD.Library
-{     
+{
     public class GpsdService
     {
         #region Private Properties
@@ -27,18 +27,25 @@ namespace GPSD.Library
         private string _proxyPassword;
 
         private GpsLocation _previousGpsLocation;
-        
+
         #endregion
 
         #region Properties
 
         public bool IsRunning { get; set; }
-        
+
         public GpsdVersion GpsdVersion { get; set; }
         public int ReadFrequenty { get; set; } = 1000;
 
         public GpsdOptions GpsOptions { get; set; }
-        
+
+        #endregion
+
+        #region Events
+
+        public delegate void LocationEventHandler(object source, GpsLocation e);
+        public event LocationEventHandler OnLocationChanged;
+
         #endregion
 
         #region Constructors
@@ -65,7 +72,7 @@ namespace GPSD.Library
             using (_client = GetTcpClient())
             {
                 if (!_client.Connected) return;
-                
+
                 var networkStream = _client.GetStream();
                 var streamReader = new StreamReader(networkStream);
 
@@ -90,7 +97,7 @@ namespace GPSD.Library
                         (_previousGpsLocation == null ||
                          gpsLocation.Time.Subtract(new TimeSpan(0, 0, 0, 0, ReadFrequenty)) > _previousGpsLocation.Time))
                     {
-                        Console.WriteLine(gpsLocation.ToString());
+                        OnLocationChanged?.Invoke(this, gpsLocation);
                         _previousGpsLocation = gpsLocation;
                         Thread.Sleep(ReadFrequenty);
                     }
@@ -105,6 +112,12 @@ namespace GPSD.Library
             ExecuteCommand(_client.GetStream(), GpsdConstants.DisableCommand);
             _client.Close();
         }
+
+        #endregion
+
+        #region Events
+
+        
 
         #endregion
 

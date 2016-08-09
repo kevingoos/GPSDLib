@@ -1,5 +1,7 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 using GPSD.Library;
+using GPSD.Library.Models;
 
 namespace GPSD.TestConsole
 {
@@ -21,7 +23,15 @@ namespace GPSD.TestConsole
             _gpsdService = new GpsdService("178.50.89.134", 80);
             //_gpsdService.SetProxy("proxy", 80);
             //_gpsdService.SetProxyAuthentication("*****", "*****");
+
+            _gpsdService.OnLocationChanged += GpsdServiceOnOnLocationChanged;
             _gpsdService.StartService();
+            
+        }
+
+        private static void GpsdServiceOnOnLocationChanged(object source, GpsLocation e)
+        {
+            Console.WriteLine(e.ToString());
         }
 
         private static bool Handler()
