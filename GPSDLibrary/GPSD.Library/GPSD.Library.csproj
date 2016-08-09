@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GpsCommands.cs" />
+    <Compile Include="GpsdDataParser.cs" />
     <Compile Include="Models\GpsDevice.cs" />
     <Compile Include="Models\GpsdVersion.cs" />
     <Compile Include="GpsdService.cs" />

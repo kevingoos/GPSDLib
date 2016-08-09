@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
@@ -27,7 +28,6 @@ namespace GPSD.Library
         private TcpClient _client;
 
         public GpsdVersion GpsdVersion { get; set; }
-
         public int ReadFrequenty = 10;
 
         public GpsdService(string serverAddress, int serverPort)
@@ -44,22 +44,22 @@ namespace GPSD.Library
                 if (!_client.Connected) return;
                 
                 var networkStream = _client.GetStream();
-                var result = new byte[128];
-                networkStream.Read(result, 0, result.Length);
+                var streamReader = new StreamReader(networkStream);
 
-                var responseData = Encoding.ASCII.GetString(result, 0, result.Length);
-                GpsdVersion = JsonConvert.DeserializeObject<GpsdVersion>(responseData);
+                var line = streamReader.ReadLine();
+                GpsdVersion = JsonConvert.DeserializeObject<GpsdVersion>(line);
                 Console.WriteLine(GpsdVersion.ToString());
 
-                var byteData = Encoding.ASCII.GetBytes(GpsCommands.EnableCommand);
-                networkStream.Write(byteData, 0, byteData.Length);
+                var streamWriter = new StreamWriter(networkStream);
+                streamWriter.WriteLine(GpsCommands.EnableCommand);
+                streamWriter.Flush();
 
-                result = new byte[512];
                 while (IsRunning && _client.Connected)
                 {
-                    networkStream.Read(result, 0, result.Length);
-                    var response = Encoding.ASCII.GetString(result, 0, result.Length);
-                    Console.WriteLine(response);
+                    
+                    line = streamReader.ReadLine();
+
+                    Console.WriteLine(line);
                     Thread.Sleep(ReadFrequenty);
                 }
             }
