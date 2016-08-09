@@ -1,8 +1,10 @@
 ﻿using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace GPSD.Library.Models
 {
-    public class GpsOptions
+    [DataContract]
+    public class GpsdOptions
     {
         [DataMember(Name = "enable")]
         public bool Enable { get; set; }
@@ -27,5 +29,10 @@ namespace GPSD.Library.Models
 
         [DataMember(Name = "pps")]
         public bool Pps { get; set; }
+
+        public string GetCommand()
+        {
+            return $"?WATCH={JsonConvert.SerializeObject(this)}";
+        }
     }
 }

@@ -46,14 +46,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GpsCommands.cs" />
+    <Compile Include="GpsdConstants.cs" />
     <Compile Include="GpsdDataParser.cs" />
     <Compile Include="Models\DataClassType.cs" />
     <Compile Include="Models\GpsDevice.cs" />
     <Compile Include="Models\GpsdVersion.cs" />
     <Compile Include="GpsdService.cs" />
     <Compile Include="Models\GpsLocation.cs" />
-    <Compile Include="Models\GpsOptions.cs" />
+    <Compile Include="Models\GpsdOptions.cs" />
     <Compile Include="Exceptions\UnknownTypeException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

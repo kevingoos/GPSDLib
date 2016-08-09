@@ -4,7 +4,6 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using GPSD.Library.Models;
 using Newtonsoft.Json;
@@ -26,7 +25,7 @@ namespace GPSD.Library
         private bool _proxyAuthenticationEnabled;
         private string _proxyUsername;
         private string _proxyPassword;
-
+        
         #endregion
 
         #region Properties
@@ -36,6 +35,8 @@ namespace GPSD.Library
         public GpsdVersion GpsdVersion { get; set; }
         public int ReadFrequenty = 10;
 
+        public GpsdOptions GpsOptions { get; set; }
+        
         #endregion
 
         #region Constructors
@@ -44,12 +45,13 @@ namespace GPSD.Library
         {
             _serverAddress = serverAddress;
             _serverPort = serverPort;
+            GpsOptions = GpsdConstants.DefaultGpsdOptions;
             IsRunning = true;
         }
 
-        public GpsdService(string serverAddress, int serverPort, GpsOptions gpsOptions = null) : this(serverAddress, serverPort)
+        public GpsdService(string serverAddress, int serverPort, GpsdOptions gpsOptions = null) : this(serverAddress, serverPort)
         {
-            
+            GpsOptions = gpsOptions ?? GpsdConstants.DefaultGpsdOptions;
         }
 
         #endregion
@@ -69,9 +71,7 @@ namespace GPSD.Library
                 GpsdVersion = JsonConvert.DeserializeObject<GpsdVersion>(line);
                 Console.WriteLine(GpsdVersion.ToString());
 
-                var streamWriter = new StreamWriter(networkStream);
-                streamWriter.WriteLine(GpsCommands.EnableCommand);
-                streamWriter.Flush();
+                ExecuteCommand(networkStream, GpsOptions.GetCommand());
 
                 while (IsRunning && _client.Connected)
                 {
@@ -87,11 +87,19 @@ namespace GPSD.Library
         {
             IsRunning = false;
 
-            var networkStream = _client.GetStream();
-            var byteData = Encoding.ASCII.GetBytes(GpsCommands.DisableCommand);
-            networkStream.Write(byteData, 0, byteData.Length);
-
+            ExecuteCommand(_client.GetStream(), GpsdConstants.DisableCommand);
             _client.Close();
+        }
+
+        #endregion
+
+        #region Helper Functions
+
+        private static void ExecuteCommand(Stream stream, string command)
+        {
+            var streamWriter = new StreamWriter(stream);
+            streamWriter.WriteLine(command);
+            streamWriter.Flush();
         }
 
         #endregion
