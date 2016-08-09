@@ -9,7 +9,7 @@ namespace GPSD.Library
 {
     public static class GpsCommands
     {
-        public const string EnableCommand = "?WATCH={\"enable\":true,\"json\":true}";
+        public const string EnableCommand = "?WATCH={\"enable\":true,\"json\":true,\"nmea\":false}";
         public const string DisableCommand = "?WATCH={\"enable\":false}";
     }
 }

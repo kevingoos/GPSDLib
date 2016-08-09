@@ -8,7 +8,6 @@ namespace GPSD.TestConsole
         {
             var gpsdService = new GpsdService("178.50.89.134", 80);
             gpsdService.SetProxy("proxy", 80);
-            gpsdService.SetProxyAuthentication("*****", "******");
             gpsdService.StartService();
         }
     }

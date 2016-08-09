@@ -13,22 +13,32 @@ namespace GPSD.Library
 {     
     public class GpsdService
     {
+        #region Private Properties
+
+        private TcpClient _client;
+
         private readonly string _serverAddress;
         private readonly int _serverPort;
 
         private bool _proxyEnabled;
         private string _proxyAddress;
         private int _proxyPort;
-
         private bool _proxyAuthenticationEnabled;
         private string _proxyUsername;
         private string _proxyPassword;
 
-        public bool IsRunning { get; set; }
-        private TcpClient _client;
+        #endregion
 
+        #region Properties
+
+        public bool IsRunning { get; set; }
+        
         public GpsdVersion GpsdVersion { get; set; }
         public int ReadFrequenty = 10;
+
+        #endregion
+
+        #region Constructors
 
         public GpsdService(string serverAddress, int serverPort)
         {
@@ -36,6 +46,15 @@ namespace GPSD.Library
             _serverPort = serverPort;
             IsRunning = true;
         }
+
+        public GpsdService(string serverAddress, int serverPort, GpsOptions gpsOptions = null) : this(serverAddress, serverPort)
+        {
+            
+        }
+
+        #endregion
+
+        #region Service Functionality
 
         public void StartService()
         {
@@ -56,9 +75,8 @@ namespace GPSD.Library
 
                 while (IsRunning && _client.Connected)
                 {
-                    
                     line = streamReader.ReadLine();
-
+                    var classType = JsonConvert.DeserializeObject<DataClassType>(line);
                     Console.WriteLine(line);
                     Thread.Sleep(ReadFrequenty);
                 }
@@ -75,9 +93,11 @@ namespace GPSD.Library
 
             _client.Close();
         }
-        
+
+        #endregion
+
         #region Proxies
-        
+
         public void SetProxy(string proxyAddress, int proxyPort)
         {
             _proxyEnabled = true;
@@ -104,6 +124,8 @@ namespace GPSD.Library
 
         private TcpClient ConnectViaHttpProxy()
         {
+            var proxy = WebRequest.GetSystemWebProxy();
+
             var uriBuilder = new UriBuilder
             {
                 Scheme = Uri.UriSchemeHttp,
