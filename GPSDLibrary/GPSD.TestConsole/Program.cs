@@ -21,8 +21,8 @@ namespace GPSD.TestConsole
             SetConsoleCtrlHandler(_handler, true);
 
             _gpsdService = new GpsdService("178.50.89.134", 80);
-            //_gpsdService.SetProxy("proxy", 80);
-            //_gpsdService.SetProxyAuthentication("*****", "*****");
+            _gpsdService.SetProxy("proxy", 80);
+            _gpsdService.SetProxyAuthentication("EXJ508", "Xlssx532");
 
             _gpsdService.OnLocationChanged += GpsdServiceOnOnLocationChanged;
             _gpsdService.StartService();
