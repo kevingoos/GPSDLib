@@ -2,10 +2,10 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>$version$</version>
-    <title>$title$</title>
-    <authors>$author$</authors>
-    <owners>$author$</owners>
+    <version>0.0.1</version>
+    <title>Ghosttje.GPSDLibrary</title>
+    <authors>Ghosttje</authors>
+    <owners>Ghosttje</owners>
     <projectUrl>https://github.com/Ghosttje/GPSD-CSharp-Library</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A library for connecting to a GPSD service (GPS Deamon) in C#. (There is no official support by the developers for C#)</description>
