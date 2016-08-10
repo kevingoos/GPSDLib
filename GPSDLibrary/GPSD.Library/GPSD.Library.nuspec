@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>$id$</id>
+    <id>Ghosttje.GPSDLib</id>
     <version>0.0.1</version>
-    <title>Ghosttje.GPSDLibrary</title>
+    <title>GPSD.NET</title>
     <authors>Ghosttje</authors>
     <owners>Ghosttje</owners>
     <projectUrl>https://github.com/Ghosttje/GPSD-CSharp-Library</projectUrl>
