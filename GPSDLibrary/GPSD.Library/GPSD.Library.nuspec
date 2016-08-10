@@ -11,6 +11,6 @@
     <description>A library for connecting to a GPSD service (GPS Deamon) in C#. (There is no official support by the developers for C#)</description>
     <releaseNotes>Initial start of the project.</releaseNotes>
     <copyright>Copyright 2016</copyright>
-	<tag>GPSD</tag>
+	<tags>GPSD</tags>
   </metadata>
 </package>
