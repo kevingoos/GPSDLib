@@ -5,10 +5,10 @@ using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Threading;
-using GPSD.Library.Models;
-using Newtonsoft.Json;
+using Ghostware.GPSDLib.Models;
+using GPSD.Library;
 
-namespace GPSD.Library
+namespace Ghostware.GPSDLib
 {
     public class GpsdService
     {
@@ -112,12 +112,6 @@ namespace GPSD.Library
             ExecuteCommand(_client.GetStream(), GpsdConstants.DisableCommand);
             _client.Close();
         }
-
-        #endregion
-
-        #region Events
-
-        
 
         #endregion
 

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using GPSD.Library.Exceptions;
+using Ghostware.GPSDLib.Exceptions;
 
-namespace GPSD.Library.Models
+namespace Ghostware.GPSDLib.Models
 {
     [DataContract]
     public class DataClassType

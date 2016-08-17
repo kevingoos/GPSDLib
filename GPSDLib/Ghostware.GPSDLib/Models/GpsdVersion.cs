@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace GPSD.Library.Models
+namespace Ghostware.GPSDLib.Models
 {
     [DataContract]
     public class GpsdVersion

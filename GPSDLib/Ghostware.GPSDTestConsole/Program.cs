@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using GPSD.Library;
-using GPSD.Library.Models;
+using Ghostware.GPSDLib;
+using Ghostware.GPSDLib.Models;
 
-namespace GPSD.TestConsole
+namespace Ghostware.GPSDTestConsole
 {
     public class Program
     {
@@ -21,8 +21,8 @@ namespace GPSD.TestConsole
             SetConsoleCtrlHandler(_handler, true);
 
             _gpsdService = new GpsdService("178.50.138.153", 80);
-            _gpsdService.SetProxy("proxy", 80);
-            _gpsdService.SetProxyAuthentication("EXJ508", "Xlssx532");
+            //_gpsdService.SetProxy("proxy", 80);
+            //_gpsdService.SetProxyAuthentication("*****", "*****");
 
             _gpsdService.OnLocationChanged += GpsdServiceOnOnLocationChanged;
             _gpsdService.StartService();

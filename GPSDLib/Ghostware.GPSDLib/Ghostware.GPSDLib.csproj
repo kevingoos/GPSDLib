@@ -7,8 +7,8 @@
     <ProjectGuid>{76CA949B-C65E-497B-AA48-8651E3306436}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GPSD.Library</RootNamespace>
-    <AssemblyName>GPSD.Library</AssemblyName>
+    <RootNamespace>Ghostware.GPSDLib</RootNamespace>
+    <AssemblyName>Ghostware.GPSDLib</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

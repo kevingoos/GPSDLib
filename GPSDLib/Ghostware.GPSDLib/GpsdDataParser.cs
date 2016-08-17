@@ -1,7 +1,7 @@
-﻿using GPSD.Library.Models;
+﻿using Ghostware.GPSDLib.Models;
 using Newtonsoft.Json;
 
-namespace GPSD.Library
+namespace Ghostware.GPSDLib
 {
     public class GpsdDataParser
     {
