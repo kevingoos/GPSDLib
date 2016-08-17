@@ -81,6 +81,7 @@ namespace GPSD.Library
                 while (IsRunning && _client.Connected)
                 {
                     var gpsData = streamReader.ReadLine();
+                    if (gpsData == null) continue;
                     var message = gpsdDataParser.GetGpsData(gpsData);
 
                     var version = message as GpsdVersion;
@@ -93,14 +94,13 @@ namespace GPSD.Library
                     }
 
                     var gpsLocation = message as GpsLocation;
-                    if (gpsLocation != null &&
-                        (_previousGpsLocation == null ||
-                         gpsLocation.Time.Subtract(new TimeSpan(0, 0, 0, 0, ReadFrequenty)) > _previousGpsLocation.Time))
-                    {
-                        OnLocationChanged?.Invoke(this, gpsLocation);
-                        _previousGpsLocation = gpsLocation;
-                        Thread.Sleep(ReadFrequenty);
-                    }
+                    if (gpsLocation == null ||
+                        (_previousGpsLocation != null &&
+                         gpsLocation.Time.Subtract(new TimeSpan(0, 0, 0, 0, ReadFrequenty)) <= _previousGpsLocation.Time))
+                        continue;
+                    OnLocationChanged?.Invoke(this, gpsLocation);
+                    _previousGpsLocation = gpsLocation;
+                    Thread.Sleep(ReadFrequenty);
                 }
             }
         }
