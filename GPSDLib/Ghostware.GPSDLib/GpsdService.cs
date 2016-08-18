@@ -6,7 +6,6 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Threading;
 using Ghostware.GPSDLib.Models;
-using GPSD.Library;
 
 namespace Ghostware.GPSDLib
 {
