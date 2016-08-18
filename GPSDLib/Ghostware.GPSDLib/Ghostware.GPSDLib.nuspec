@@ -10,12 +10,12 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A library for connecting to a GPSD service (GPS Deamon) in C#. (There is no official support by the developers for C#)</description>
     <releaseNotes>
-		v 1.0.0:
+		v1.0.0:
 		--------
 		- Bugfix: parser crashes when there is no data coming in.
 		- Rename of package (from Ghosttje.GPSDLib to Ghostware.GPSDLib)
 	
-		v 0.0.1:
+		v0.0.1:
 		--------
 		- Initial start of the project.
 	</releaseNotes>
