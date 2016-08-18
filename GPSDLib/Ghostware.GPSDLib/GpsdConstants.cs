@@ -1,6 +1,6 @@
-﻿using GPSD.Library.Models;
+﻿using Ghostware.GPSDLib.Models;
 
-namespace GPSD.Library
+namespace Ghostware.GPSDLib
 {
     public static class GpsdConstants
     {

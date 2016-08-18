@@ -7,8 +7,8 @@
     <ProjectGuid>{A5ABDCCF-ECA9-4C69-9B89-63C4432D9E07}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GPSD.TestConsole</RootNamespace>
-    <AssemblyName>GPSD.TestConsole</AssemblyName>
+    <RootNamespace>Ghostware.GPSDTestConsole</RootNamespace>
+    <AssemblyName>Ghostware.GPSDTestConsole</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -50,9 +50,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GPSD.Library\GPSD.Library.csproj">
+    <ProjectReference Include="..\Ghostware.GPSDLib\Ghostware.GPSDLib.csproj">
       <Project>{76ca949b-c65e-497b-aa48-8651e3306436}</Project>
-      <Name>GPSD.Library</Name>
+      <Name>Ghostware.GPSDLib</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

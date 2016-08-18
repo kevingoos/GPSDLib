@@ -5,10 +5,9 @@ using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Threading;
-using GPSD.Library.Models;
-using Newtonsoft.Json;
+using Ghostware.GPSDLib.Models;
 
-namespace GPSD.Library
+namespace Ghostware.GPSDLib
 {
     public class GpsdService
     {
@@ -81,6 +80,7 @@ namespace GPSD.Library
                 while (IsRunning && _client.Connected)
                 {
                     var gpsData = streamReader.ReadLine();
+                    if (gpsData == null) continue;
                     var message = gpsdDataParser.GetGpsData(gpsData);
 
                     var version = message as GpsdVersion;
@@ -93,14 +93,13 @@ namespace GPSD.Library
                     }
 
                     var gpsLocation = message as GpsLocation;
-                    if (gpsLocation != null &&
-                        (_previousGpsLocation == null ||
-                         gpsLocation.Time.Subtract(new TimeSpan(0, 0, 0, 0, ReadFrequenty)) > _previousGpsLocation.Time))
-                    {
-                        OnLocationChanged?.Invoke(this, gpsLocation);
-                        _previousGpsLocation = gpsLocation;
-                        Thread.Sleep(ReadFrequenty);
-                    }
+                    if (gpsLocation == null ||
+                        (_previousGpsLocation != null &&
+                         gpsLocation.Time.Subtract(new TimeSpan(0, 0, 0, 0, ReadFrequenty)) <= _previousGpsLocation.Time))
+                        continue;
+                    OnLocationChanged?.Invoke(this, gpsLocation);
+                    _previousGpsLocation = gpsLocation;
+                    Thread.Sleep(ReadFrequenty);
                 }
             }
         }
@@ -112,12 +111,6 @@ namespace GPSD.Library
             ExecuteCommand(_client.GetStream(), GpsdConstants.DisableCommand);
             _client.Close();
         }
-
-        #endregion
-
-        #region Events
-
-        
 
         #endregion
 

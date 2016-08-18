@@ -1,7 +1,7 @@
 ﻿using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
-namespace GPSD.Library.Models
+namespace Ghostware.GPSDLib.Models
 {
     [DataContract]
     public class GpsdOptions
