@@ -6,7 +6,7 @@
     <title>Ghostware.GPSDLib</title>
     <authors>Ghosttje</authors>
     <owners>Ghostware</owners>
-    <projectUrl>https://github.com/Ghosttje/GPSDLib</projectUrl>
+    <projectUrl>https://github.com/GhostwareDev/GPSDLib</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A library for connecting to a GPSD service (GPS Deamon) in C#. (There is no official support by the developers for C#)</description>
     <releaseNotes>
