@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Security;
 using System.Threading;
 using Ghostware.GPSDLib.Models;
 
@@ -23,7 +24,7 @@ namespace Ghostware.GPSDLib
         private int _proxyPort;
         private bool _proxyAuthenticationEnabled;
         private string _proxyUsername;
-        private string _proxyPassword;
+        private SecureString _proxyPassword;
 
         private GpsLocation _previousGpsLocation;
 
@@ -138,6 +139,19 @@ namespace Ghostware.GPSDLib
         {
             _proxyAuthenticationEnabled = true;
             _proxyUsername = username;
+
+            var securePass = new SecureString();
+            foreach (var passwordChar in password)
+            {
+                securePass.AppendChar(passwordChar);
+            }
+            _proxyPassword = securePass;
+        }
+
+        public void SetProxyAuthentication(string username, SecureString password)
+        {
+            _proxyAuthenticationEnabled = true;
+            _proxyUsername = username;
             _proxyPassword = password;
         }
 
@@ -153,8 +167,6 @@ namespace Ghostware.GPSDLib
 
         private TcpClient ConnectViaHttpProxy()
         {
-            var proxy = WebRequest.GetSystemWebProxy();
-
             var uriBuilder = new UriBuilder
             {
                 Scheme = Uri.UriSchemeHttp,

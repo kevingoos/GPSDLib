@@ -20,13 +20,12 @@ namespace Ghostware.GPSDTestConsole
             _handler += Handler;
             SetConsoleCtrlHandler(_handler, true);
 
-            _gpsdService = new GpsdService("178.50.138.153", 80);
-            //_gpsdService.SetProxy("proxy", 80);
-            //_gpsdService.SetProxyAuthentication("*****", "*****");
+            _gpsdService = new GpsdService("***.***.***.***", 80);
+            _gpsdService.SetProxy("proxy", 80);
+            _gpsdService.SetProxyAuthentication("*****", "*****");
 
             _gpsdService.OnLocationChanged += GpsdServiceOnOnLocationChanged;
             _gpsdService.StartService();
-            
         }
 
         private static void GpsdServiceOnOnLocationChanged(object source, GpsLocation e)
