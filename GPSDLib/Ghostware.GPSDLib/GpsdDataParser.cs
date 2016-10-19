@@ -7,8 +7,19 @@ namespace Ghostware.GPSDLib
     {
         public object GetGpsData(string gpsData)
         {
-            var classType = JsonConvert.DeserializeObject<DataClassType>(gpsData);
-            return JsonConvert.DeserializeObject(gpsData, classType.GetClassType());
+            try
+            {
+                var classType = JsonConvert.DeserializeObject<DataClassType>(gpsData);
+                return JsonConvert.DeserializeObject(gpsData, classType.GetClassType());
+            }
+            catch (JsonReaderException ex)
+            {
+                return null;
+            }
+            catch (JsonSerializationException ex)
+            {
+                return null;
+            }
         }
     }
 }
