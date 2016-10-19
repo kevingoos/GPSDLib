@@ -44,7 +44,9 @@ namespace Ghostware.GPSDLib
         #region Events
 
         public delegate void LocationEventHandler(object source, GpsLocation e);
+        public delegate void RawLocationEventHandler(object source, string rawLocation);
         public event LocationEventHandler OnLocationChanged;
+        public event RawLocationEventHandler OnRawLocationChanged;
 
         #endregion
 
@@ -77,11 +79,16 @@ namespace Ghostware.GPSDLib
                 var streamReader = new StreamReader(networkStream);
 
                 var gpsdDataParser = new GpsdDataParser();
-
                 while (IsRunning && _client.Connected)
                 {
                     var gpsData = streamReader.ReadLine();
-                    if (gpsData == null) continue;
+                    OnRawLocationChanged?.Invoke(this, gpsData);
+                    if (gpsData == null)
+                    {
+                        networkStream = _client.GetStream();
+                        streamReader = new StreamReader(networkStream);
+                        continue;
+                    }
                     var message = gpsdDataParser.GetGpsData(gpsData);
 
                     var version = message as GpsdVersion;
@@ -190,7 +197,9 @@ namespace Ghostware.GPSDLib
                 webProxy.UseDefaultCredentials = true;
             }
 
-            var response = request.GetResponse();
+            var response = Retry.Do(request.GetResponse, TimeSpan.FromSeconds(1));
+            //var response = request.GetResponse();
+
             var responseStream = response.GetResponseStream();
             Debug.Assert(responseStream != null);
 

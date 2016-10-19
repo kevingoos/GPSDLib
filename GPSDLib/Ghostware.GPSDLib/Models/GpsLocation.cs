@@ -31,7 +31,9 @@ namespace Ghostware.GPSDLib.Models
         public float Track { get; set; }
 
         [DataMember(Name = "speed")]
-        public float Speed { get; set; }
+        public float SpeedKnots { get; set; }
+
+        public double Speed => SpeedKnots * 1.852;
 
         public override string ToString()
         {
