@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Ghostware.GPSDLib
+namespace Ghostware.GPSDTestApplication
 {
     public static class Retry
     {

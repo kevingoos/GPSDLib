@@ -2,19 +2,24 @@
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Security;
-using System.Threading;
+using Ghostware.GPSDLib.Exceptions;
 using Ghostware.GPSDLib.Models;
 
 namespace Ghostware.GPSDLib
 {
-    public class GpsdService
+    public class GpsdService : IDisposable
     {
         #region Private Properties
 
         private TcpClient _client;
+        private StreamReader _streamReader;
+        private StreamWriter _streamWriter;
+
+        private GpsdDataParser _gpsdDataParser;
 
         private readonly string _serverAddress;
         private readonly int _serverPort;
@@ -28,23 +33,28 @@ namespace Ghostware.GPSDLib
 
         private GpsLocation _previousGpsLocation;
 
+        
+        private int _retryReadCount;
+
         #endregion
 
         #region Properties
 
         public bool IsRunning { get; set; }
-
-        public GpsdVersion GpsdVersion { get; set; }
         public int ReadFrequenty { get; set; } = 1000;
+        public int RetryRead { get; set; } = 3;
 
         public GpsdOptions GpsOptions { get; set; }
 
+        
         #endregion
 
         #region Events
 
+        public delegate void VersionEventHandler(object source, GpsdVersion e);
         public delegate void LocationEventHandler(object source, GpsLocation e);
         public delegate void RawLocationEventHandler(object source, string rawLocation);
+        public event VersionEventHandler OnGpsdVersionChanged;
         public event LocationEventHandler OnLocationChanged;
         public event RawLocationEventHandler OnRawLocationChanged;
 
@@ -67,68 +77,90 @@ namespace Ghostware.GPSDLib
 
         #endregion
 
-        #region Service Functionality
+        #region Connection Functionality
 
-        public void StartService()
+        public bool Connect()
         {
-            using (_client = GetTcpClient())
+            _client = _proxyEnabled ? ConnectViaHttpProxy() : new TcpClient(_serverAddress, _serverPort);
+            _streamReader = new StreamReader(_client.GetStream());
+            _streamWriter = new StreamWriter(_client.GetStream());
+
+            _gpsdDataParser = new GpsdDataParser();
+
+            var gpsData = _streamReader.ReadLine();
+            var message = _gpsdDataParser.GetGpsData(gpsData);
+            var version = message as GpsdVersion;
+            if (version == null) return false;
+            OnGpsdVersionChanged?.Invoke(this, version);
+            ExecuteGpsdCommand(GpsOptions.GetCommand());
+            return true;
+        }
+
+        public bool Disconnect()
+        {
+            StopGpsReading();
+            Dispose();
+            return true;
+        }
+
+        #endregion
+
+        #region Gps Reading Functionality
+
+        /// <summary>
+        /// This task reads the gps. This task will run in a loop, so keep in mind to run it in a thread.
+        /// </summary>
+        /// <exception cref="NotConnectedException">Exception when client is not connected or streamreader is null. Plz call connect!</exception>
+        /// <exception cref="ConnectionLostException">Exception when the connection is lost.</exception>
+        public void StartGpsReading()
+        {
+            if (_streamReader == null || !_client.Connected) throw new NotConnectedException();
+
+            _retryReadCount = RetryRead;
+            IsRunning = true;
+            while (IsRunning)
             {
-                if (!_client.Connected) return;
-
-                var networkStream = _client.GetStream();
-                var streamReader = new StreamReader(networkStream);
-
-                var gpsdDataParser = new GpsdDataParser();
-                while (IsRunning && _client.Connected)
+                if (_client.Connected)
                 {
-                    var gpsData = streamReader.ReadLine();
-                    OnRawLocationChanged?.Invoke(this, gpsData);
-                    if (gpsData == null)
-                    {
-                        networkStream = _client.GetStream();
-                        streamReader = new StreamReader(networkStream);
-                        continue;
-                    }
-                    var message = gpsdDataParser.GetGpsData(gpsData);
-
-                    var version = message as GpsdVersion;
-                    if (version != null)
-                    {
-                        GpsdVersion = version;
-                        Console.WriteLine(GpsdVersion.ToString());
-
-                        ExecuteCommand(networkStream, GpsOptions.GetCommand());
-                    }
-
-                    var gpsLocation = message as GpsLocation;
-                    if (gpsLocation == null ||
-                        (_previousGpsLocation != null &&
-                         gpsLocation.Time.Subtract(new TimeSpan(0, 0, 0, 0, ReadFrequenty)) <= _previousGpsLocation.Time))
-                        continue;
-                    OnLocationChanged?.Invoke(this, gpsLocation);
-                    _previousGpsLocation = gpsLocation;
-                    Thread.Sleep(ReadFrequenty);
+                    throw new ConnectionLostException();
                 }
+
+                var gpsData = _streamReader.ReadLine();
+                OnRawLocationChanged?.Invoke(this, gpsData);
+                if (gpsData == null)
+                {
+                    if (_retryReadCount == 0)
+                    {
+                        throw new ConnectionLostException();
+                    }
+                    _retryReadCount--;
+                    continue;
+                }
+
+                var message = _gpsdDataParser.GetGpsData(gpsData);
+                var gpsLocation = message as GpsLocation;
+                if (gpsLocation == null || (_previousGpsLocation != null && gpsLocation.Time.Subtract(new TimeSpan(0, 0, 0, 0, ReadFrequenty)) <= _previousGpsLocation.Time))
+                    continue;
+                OnLocationChanged?.Invoke(this, gpsLocation);
+                _previousGpsLocation = gpsLocation;
             }
         }
 
-        public void StopService()
+        public void StopGpsReading()
         {
+            if (!IsRunning) return;
             IsRunning = false;
-
-            ExecuteCommand(_client.GetStream(), GpsdConstants.DisableCommand);
-            _client.Close();
+            ExecuteGpsdCommand(GpsdConstants.DisableCommand);
         }
 
         #endregion
 
         #region Helper Functions
 
-        private static void ExecuteCommand(Stream stream, string command)
+        private void ExecuteGpsdCommand(string command)
         {
-            var streamWriter = new StreamWriter(stream);
-            streamWriter.WriteLine(command);
-            streamWriter.Flush();
+            _streamWriter.WriteLine(command);
+            _streamWriter.Flush();
         }
 
         #endregion
@@ -167,11 +199,6 @@ namespace Ghostware.GPSDLib
             _proxyEnabled = false;
         }
 
-        private TcpClient GetTcpClient()
-        {
-            return _proxyEnabled ? ConnectViaHttpProxy() : new TcpClient(_serverAddress, _serverPort);
-        }
-
         private TcpClient ConnectViaHttpProxy()
         {
             var uriBuilder = new UriBuilder
@@ -197,9 +224,7 @@ namespace Ghostware.GPSDLib
                 webProxy.UseDefaultCredentials = true;
             }
 
-            var response = Retry.Do(request.GetResponse, TimeSpan.FromSeconds(1));
-            //var response = request.GetResponse();
-
+            var response = request.GetResponse();
             var responseStream = response.GetResponseStream();
             Debug.Assert(responseStream != null);
 
@@ -218,6 +243,18 @@ namespace Ghostware.GPSDLib
             var socket = (Socket)socketProperty.GetValue(networkStream, null);
 
             return new TcpClient { Client = socket };
+        }
+
+        #endregion
+
+        #region Dispose
+
+        public void Dispose()
+        {
+            _streamReader?.Close();
+            _streamWriter?.Close();
+            //_client?.GetStream().Close();
+            _client?.Close();
         }
 
         #endregion
