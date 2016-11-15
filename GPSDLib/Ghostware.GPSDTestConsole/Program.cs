@@ -3,6 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using Ghostware.GPSDLib;
 using Ghostware.GPSDLib.Models;
 
@@ -14,16 +16,16 @@ namespace Ghostware.GPSDTestConsole
         private static extern bool SetConsoleCtrlHandler(EventHandler handler, bool add);
 
         private delegate bool EventHandler();
+        private static EventHandler _eventHandler;
 
-        private static EventHandler _handler;
         private static StreamWriter _writer;
 
         private static GpsdService _gpsdService;
 
         static void Main(string[] args)
         {
-            _handler += Handler;
-            SetConsoleCtrlHandler(_handler, true);
+            _eventHandler += ExitHandler;
+            SetConsoleCtrlHandler(_eventHandler, true);
 
             _gpsdService = new GpsdService("***.***.***.***", 80);
             //_gpsdService = new GpsdService("127.0.0.1", 80);
@@ -38,7 +40,7 @@ namespace Ghostware.GPSDTestConsole
 
             try
             {
-                _gpsdService.StartService();
+                Retry.Do(_gpsdService.Connect, TimeSpan.FromSeconds(1));
             }
             catch (AggregateException ax)
             {
@@ -47,6 +49,11 @@ namespace Ghostware.GPSDTestConsole
                     Console.WriteLine("Cannot connect to the service you have given.");
                 }
             }
+
+            _gpsdService.StartGpsReading();
+
+            Console.WriteLine("Press enter to continue...");
+            Console.ReadKey();
         }
 
         private static void GpsdServiceOnLocationChanged(object source, GpsLocation e)
@@ -59,9 +66,9 @@ namespace Ghostware.GPSDTestConsole
             _writer.WriteLine(rawData);
         }
 
-        private static bool Handler()
+        private static bool ExitHandler()
         {
-            _gpsdService?.StopService();
+            _gpsdService?.Disconnect();
             return true;
         }
     }

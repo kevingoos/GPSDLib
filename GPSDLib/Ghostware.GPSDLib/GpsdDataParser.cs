@@ -12,11 +12,11 @@ namespace Ghostware.GPSDLib
                 var classType = JsonConvert.DeserializeObject<DataClassType>(gpsData);
                 return JsonConvert.DeserializeObject(gpsData, classType.GetClassType());
             }
-            catch (JsonReaderException ex)
+            catch (JsonReaderException)
             {
                 return null;
             }
-            catch (JsonSerializationException ex)
+            catch (JsonSerializationException)
             {
                 return null;
             }
