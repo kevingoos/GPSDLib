@@ -26,11 +26,14 @@ namespace Ghostware.GPSDTestApplication
 
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
+            if (_gpsdService != null && _gpsdService.IsRunning) return;
             //_gpsdService = new GpsdService("***.***.***.***", 80);
-            _gpsdService = new GpsdService("127.0.0.1", 80);
+            //_gpsdService = new GpsdService("127.0.0.1", 80);
+            _gpsdService = new GpsdService("178.50.236.232", 80);
 
-            //_gpsdService.SetProxy("proxy", 80);
+            _gpsdService.SetProxy("proxy", 80);
             //_gpsdService.SetProxyAuthentication("*****", "*****");
+            _gpsdService.SetProxyAuthentication("EXJ508", "Xlssx533");
 
             _writer = new StreamWriter("testFile1.nmea");
 

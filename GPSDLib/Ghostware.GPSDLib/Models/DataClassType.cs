@@ -11,7 +11,7 @@ namespace Ghostware.GPSDLib.Models
         public static Dictionary<string, Type> TypeDictionary = new Dictionary<string, Type>
         {
             {"VERSION", typeof(GpsdVersion)},
-            {"DEVICES", typeof(GpsDevice)},
+            {"DEVICES", typeof(GpsDevices)},
             {"WATCH", typeof(GpsdOptions)},
             {"TPV", typeof(GpsLocation)}
         };

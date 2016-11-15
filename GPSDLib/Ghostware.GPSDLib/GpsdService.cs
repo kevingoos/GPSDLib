@@ -2,10 +2,10 @@
 using System.Diagnostics;
 using System.IO;
 using System.Net;
-using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Security;
+using System.Threading.Tasks;
 using Ghostware.GPSDLib.Exceptions;
 using Ghostware.GPSDLib.Models;
 
@@ -125,26 +125,39 @@ namespace Ghostware.GPSDLib
                     throw new ConnectionLostException();
                 }
 
-                var gpsData = _streamReader.ReadLine();
-                OnRawLocationChanged?.Invoke(this, gpsData);
-                if (gpsData == null)
+                try
                 {
-                    if (_retryReadCount == 0)
+                    var gpsData = _streamReader.ReadLine();
+                    OnRawLocationChanged?.Invoke(this, gpsData);
+                    if (gpsData == null)
                     {
-                        throw new ConnectionLostException();
+                        if (_retryReadCount == 0)
+                        {
+                            throw new ConnectionLostException();
+                        }
+                        _retryReadCount--;
+                        continue;
                     }
-                    _retryReadCount--;
-                    continue;
-                }
 
-                var message = _gpsdDataParser.GetGpsData(gpsData);
-                var gpsLocation = message as GpsLocation;
-                if (gpsLocation == null || (_previousGpsLocation != null && gpsLocation.Time.Subtract(new TimeSpan(0, 0, 0, 0, ReadFrequenty)) <= _previousGpsLocation.Time))
-                    continue;
-                OnLocationChanged?.Invoke(this, gpsLocation);
-                _previousGpsLocation = gpsLocation;
+                    var message = _gpsdDataParser.GetGpsData(gpsData);
+                    var gpsLocation = message as GpsLocation;
+                    if (gpsLocation == null || (_previousGpsLocation != null && gpsLocation.Time.Subtract(new TimeSpan(0, 0, 0, 0, ReadFrequenty)) <= _previousGpsLocation.Time))
+                        continue;
+                    OnLocationChanged?.Invoke(this, gpsLocation);
+                    _previousGpsLocation = gpsLocation;
+                }
+                catch (IOException)
+                {
+                    return;
+                }
             }
         }
+
+        public Task StartGpsReadingAsync()
+        {
+            return new Task(StartGpsReading);
+        }
+
 
         public void StopGpsReading()
         {

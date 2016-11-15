@@ -52,6 +52,7 @@
     <Compile Include="GpsdDataParser.cs" />
     <Compile Include="Models\DataClassType.cs" />
     <Compile Include="Models\GpsDevice.cs" />
+    <Compile Include="Models\GpsDevices.cs" />
     <Compile Include="Models\GpsdVersion.cs" />
     <Compile Include="GpsdService.cs" />
     <Compile Include="Models\GpsLocation.cs" />
