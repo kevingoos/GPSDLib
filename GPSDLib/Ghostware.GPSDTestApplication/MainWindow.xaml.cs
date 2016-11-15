@@ -27,12 +27,10 @@ namespace Ghostware.GPSDTestApplication
         private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
             //_gpsdService = new GpsdService("***.***.***.***", 80);
-            _gpsdService = new GpsdService("178.50.213.21", 80);
-            //_gpsdService = new GpsdService("127.0.0.1", 80);
+            _gpsdService = new GpsdService("127.0.0.1", 80);
 
-            _gpsdService.SetProxy("proxy", 80);
+            //_gpsdService.SetProxy("proxy", 80);
             //_gpsdService.SetProxyAuthentication("*****", "*****");
-            _gpsdService.SetProxyAuthentication("EXJ508", "Xlssx531");
 
             _writer = new StreamWriter("testFile1.nmea");
 
@@ -56,7 +54,12 @@ namespace Ghostware.GPSDTestApplication
 
         private void GpsdServiceOnLocationChanged(object source, GpsLocation e)
         {
-            GpsTextBox.Text = GpsTextBox.Text + e + "\n";
+            Dispatcher.Invoke(() =>
+            {
+                if (GpsTextBox == null) return;
+                GpsTextBox.Text = GpsTextBox.Text + e + "\n";
+            });
+
             Console.WriteLine(e.ToString());
         }
 

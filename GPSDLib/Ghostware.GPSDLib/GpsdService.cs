@@ -120,7 +120,7 @@ namespace Ghostware.GPSDLib
             IsRunning = true;
             while (IsRunning)
             {
-                if (_client.Connected)
+                if (!_client.Connected)
                 {
                     throw new ConnectionLostException();
                 }
