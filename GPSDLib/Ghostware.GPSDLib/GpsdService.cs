@@ -172,6 +172,7 @@ namespace Ghostware.GPSDLib
 
         private void ExecuteGpsdCommand(string command)
         {
+            if (_streamWriter == null) return;
             _streamWriter.WriteLine(command);
             _streamWriter.Flush();
         }
@@ -264,6 +265,7 @@ namespace Ghostware.GPSDLib
 
         public void Dispose()
         {
+            StopGpsReading();
             _streamReader?.Close();
             _streamWriter?.Close();
             //_client?.GetStream().Close();
