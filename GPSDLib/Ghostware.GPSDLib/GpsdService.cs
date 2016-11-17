@@ -265,10 +265,8 @@ namespace Ghostware.GPSDLib
 
         public void Dispose()
         {
-            StopGpsReading();
             _streamReader?.Close();
             _streamWriter?.Close();
-            //_client?.GetStream().Close();
             _client?.Close();
         }
 

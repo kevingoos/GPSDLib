@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Ghostware.GPSDLib</id>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <title>Ghostware.GPSDLib</title>
     <authors>Ghosttje</authors>
     <owners>Ghostware</owners>
@@ -10,6 +10,10 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A library for connecting to a GPSD service (GPS Deamon) in C#. (There is no official support by the developers for C#)</description>
     <releaseNotes>
+		v1.0.4:
+		--------
+		- Small bugfixes
+	
 		v1.0.3:
 		--------
 		- Added some features for WPF.
