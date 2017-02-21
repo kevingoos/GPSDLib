@@ -2,14 +2,20 @@
 <package >
   <metadata>
     <id>Ghostware.GPSDLib</id>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
     <title>Ghostware.GPSDLib</title>
-    <authors>Ghosttje</authors>
+    <authors>Kevin Goos</authors>
     <owners>Ghostware</owners>
     <projectUrl>https://github.com/GhostwareDev/GPSDLib</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A library for connecting to a GPSD service (GPS Deamon) in C#. (There is no official support by the developers for C#)</description>
     <releaseNotes>
+		Deprecated: please use https://www.nuget.org/packages/Ghostware.GPS.NET/ instead!
+		
+		v1.0.6:
+		--------
+		- Deprecated
+		
 		v1.0.5:
 		--------
 		- Bugfixes
@@ -45,7 +51,7 @@
 		--------
 		- Initial start of the project.
 	</releaseNotes>
-    <copyright>Copyright 2016</copyright>
+    <copyright>Copyright  © Ghostware 2016</copyright>
 	<tags>GPSD</tags>
   </metadata>
 </package>

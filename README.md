@@ -1,3 +1,5 @@
+#DEPRECATED: please use https://github.com/GhostwareDev/GPS.NET instead!
+
 # Ghostware.GPSDLib
 A library for connecting to a GPSD (GPS Deamon) service in C#.
 
